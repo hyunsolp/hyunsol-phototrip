@@ -527,10 +527,7 @@
       var val = snapshot.val();
       if (val) _appData = val;
       if (!currentUser) return;
-      renderHome();
-      renderMissions();
-      renderReviews();
-      renderPeople();
+      renderAll();
     });
   }
 
@@ -541,8 +538,17 @@
   }
   function ensureUser(nick, d, group) {
     if (!d.users) d.users = {};
-    if (!d.users[nick]) d.users[nick] = { missions: [null, null, null, null, null], group: group || '' };
+    if (!d.users[nick]) d.users[nick] = { missions: [false, false, false, false, false], group: group || '' };
     else if (group && !d.users[nick].group) d.users[nick].group = group;
+    // missions가 배열이 아니거나 없으면 정규화
+    var u = d.users[nick];
+    if (!u.missions || typeof u.missions !== 'object') {
+      u.missions = [false, false, false, false, false];
+    } else if (!Array.isArray(u.missions)) {
+      var arr = [false, false, false, false, false];
+      for (var i = 0; i < 5; i++) { if (u.missions[i]) arr[i] = u.missions[i]; }
+      u.missions = arr;
+    }
     return d;
   }
   function esc(s) {
@@ -702,14 +708,21 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
   });
 
   /* ── 앱 진입 ── */
+  function renderAll() {
+    try { renderHome(); } catch(e) {}
+    try { renderMissions(); } catch(e) {}
+    try { renderReviews(); } catch(e) {}
+    try { renderPeople(); } catch(e) {}
+  }
+
   function showApp() {
     showScreen('screen-app');
     document.getElementById('disp-nick').textContent = currentUser.nickname + (currentUser.group ? ' · ' + currentUser.group : '');
     document.getElementById('hero-greet').textContent = '안녕하세요, ' + currentUser.nickname + '님';
     setActiveTab('home');
-    renderHome();
-    renderMissions();
-    renderReviews();
+    renderAll();
+    // Firebase 로딩 완료 후 재렌더
+    setTimeout(function() { if (currentUser) renderAll(); }, 1500);
   }
 
   /* ── 탭 전환 ── */
