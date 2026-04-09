@@ -225,6 +225,12 @@
   .people-card-head { background:var(--dark-brown); padding:11px 16px; display:flex; align-items:center; justify-content:space-between; }
   .people-card-title { color:var(--gold); font-size:14px; font-weight:900; }
   .people-card-sub { color:var(--gold-light); font-size:11px; }
+  .people-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; padding:16px; }
+  .people-member { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .people-photo { width:70px; height:70px; border-radius:50%; object-fit:cover; border:2.5px solid var(--gold); }
+  .people-photo-placeholder { width:70px; height:70px; border-radius:50%; background:var(--dark-brown); border:2.5px solid var(--gold); display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:22px; font-weight:900; }
+  .people-nick { font-size:12px; font-weight:700; color:#333; text-align:center; }
+  .people-self-badge { font-size:10px; color:var(--gold); font-weight:700; }
 
   /* copyright */
   .copyright { text-align:center; color:rgba(255,255,255,.35); font-size:11px; margin-top:28px; letter-spacing:1px; }
@@ -519,17 +525,12 @@
   function startFirebaseSync() {
     window._fbOnValue(window._fbRef, function(snapshot) {
       var val = snapshot.val();
-      if (val) {
-        _appData = val;
-        if (document.getElementById('tab-people') &&
-            document.getElementById('tab-people').classList.contains('active')) {
-          renderPeople();
-        }
-        if (document.getElementById('tab-home') &&
-            document.getElementById('tab-home').classList.contains('active')) {
-          renderHome();
-        }
-      }
+      if (val) _appData = val;
+      if (!currentUser) return;
+      renderHome();
+      renderMissions();
+      renderReviews();
+      renderPeople();
     });
   }
 
@@ -667,7 +668,10 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
     setActiveTab('home');
   }
   document.getElementById('btn-logout-app').addEventListener('click', doLogout);
-  document.getElementById('btn-logout-admin').addEventListener('click', doLogout);
+  document.getElementById('btn-logout-admin').addEventListener('click', function () {
+    currentUser = null;
+    showScreen('screen-intro');
+  });
 
   /* ── 관리자 탭 전환 ── */
   document.getElementById('screen-admin').addEventListener('click', function (e) {
@@ -1066,7 +1070,7 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
           if (u.group === grpName) {
             var cnt = 0;
             for (var m = 0; m < u.missions.length; m++) if (u.missions[m]) cnt++;
-            members.push({ nick: keys[k], missions: u.missions, count: cnt });
+            members.push({ nick: keys[k], missions: u.missions, count: cnt, photo: u.photo || '' });
           }
         }
         if (!members.length) return;
@@ -1076,20 +1080,22 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
           '<span class="people-card-title">' + esc(grpName) + '</span>' +
           '<span class="people-card-sub">👥 ' + members.length + '명</span>' +
           '</div>';
+        var grid = document.createElement('div');
+        grid.className = 'people-grid';
         for (var mi = 0; mi < members.length; mi++) {
           var mem = members[mi];
           var isSelf = currentUser && mem.nick === currentUser.nickname;
-          var dots = '';
-          for (var di = 0; di < 5; di++) dots += '<div class="gm-dot' + (mem.missions[di] ? ' on' : '') + '"></div>';
           var memDiv = document.createElement('div');
-          memDiv.className = 'group-member';
-          memDiv.innerHTML =
-            '<div class="gm-avatar" style="' + (isSelf ? 'background:var(--gold);color:var(--dark-brown);' : '') + '">' + esc(mem.nick.charAt(0).toUpperCase()) + '</div>' +
-            '<div class="gm-name">' + esc(mem.nick) + (isSelf ? ' <span style="font-size:10px;color:var(--gold);font-weight:700;">(나)</span>' : '') + '</div>' +
-            '<div class="gm-dots">' + dots + '</div>' +
-            '<div class="gm-score">' + mem.count + '/5</div>';
-          card.appendChild(memDiv);
+          memDiv.className = 'people-member';
+          var photoHtml = mem.photo
+            ? '<img class="people-photo" src="' + mem.photo + '" alt="' + esc(mem.nick) + '"' + (isSelf ? ' style="border-color:var(--gold);box-shadow:0 0 0 2px var(--gold);"' : '') + '>'
+            : '<div class="people-photo-placeholder">' + esc(mem.nick.charAt(0).toUpperCase()) + '</div>';
+          memDiv.innerHTML = photoHtml +
+            '<div class="people-nick">' + esc(mem.nick) + '</div>' +
+            (isSelf ? '<div class="people-self-badge">나</div>' : '');
+          grid.appendChild(memDiv);
         }
+        card.appendChild(grid);
         wrap.appendChild(card);
       })(GROUPS[gi]);
     }
