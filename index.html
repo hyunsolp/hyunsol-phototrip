@@ -4,6 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>현솔의 사진 콘테스트</title>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCTPwlbEs-JNd5XPxzJVhWGJqkscO9fv5g",
+    authDomain: "hyunsol-trip.firebaseapp.com",
+    databaseURL: "https://hyunsol-trip-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "hyunsol-trip",
+    storageBucket: "hyunsol-trip.firebasestorage.app",
+    messagingSenderId: "402199693329",
+    appId: "1:402199693329:web:812c3f0d9bb0b97f7209b0"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const dbRef = ref(db, 'hyunsol_v2');
+
+  window._fbDb = db;
+  window._fbRef = dbRef;
+  window._fbSet = set;
+  window._fbGet = get;
+  window._fbRef2 = ref;
+  window._fbOnValue = onValue;
+  window._fbReady = true;
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
 <style>
   :root {
     --black: #0a0a0a;
@@ -476,29 +503,40 @@
 
   var currentUser = null;
 
-  /* ── 안전한 스토리지 (localStorage 차단 시 메모리 폴백) ── */
-  var memStore = {};
-  var store = {
-    get: function (k) {
-      try { return localStorage.getItem(k); }
-      catch (e) { return memStore[k] !== undefined ? memStore[k] : null; }
-    },
-    set: function (k, v) {
-      try { localStorage.setItem(k, v); }
-      catch (e) { memStore[k] = v; }
-    }
-  };
+  /* ── Firebase 연동 데이터 저장소 ── */
+  var _appData = { users: {}, reviews: [] };
 
-  function getData() {
-    try {
-      var raw = store.get('hyunsol_v2');
-      return raw ? JSON.parse(raw) : { users: {}, reviews: [] };
-    } catch (e) {
-      return { users: {}, reviews: [] };
+  function getData() { return _appData; }
+
+  function saveData(d) {
+    _appData = d;
+    if (window._fbReady) {
+      window._fbSet(window._fbRef, d).catch(function(e){ console.error('FB save error', e); });
     }
   }
-  function saveData(d) {
-    try { store.set('hyunsol_v2', JSON.stringify(d)); } catch (e) {}
+
+  /* Firebase 실시간 동기화 시작 */
+  function startFirebaseSync() {
+    window._fbOnValue(window._fbRef, function(snapshot) {
+      var val = snapshot.val();
+      if (val) {
+        _appData = val;
+        if (document.getElementById('tab-people') &&
+            document.getElementById('tab-people').classList.contains('active')) {
+          renderPeople();
+        }
+        if (document.getElementById('tab-home') &&
+            document.getElementById('tab-home').classList.contains('active')) {
+          renderHome();
+        }
+      }
+    });
+  }
+
+  if (window._fbReady) {
+    startFirebaseSync();
+  } else {
+    window.addEventListener('firebase-ready', startFirebaseSync);
   }
   function ensureUser(nick, d, group) {
     if (!d.users) d.users = {};
