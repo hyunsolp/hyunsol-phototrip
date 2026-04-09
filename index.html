@@ -44,13 +44,12 @@
   .step-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.2); transition:all .3s; }
   .step-dot.active { background:var(--gold); width:24px; border-radius:4px; }
   /* PHOTO UPLOAD */
-  .photo-upload-zone { border:2px dashed rgba(200,169,110,.4); border-radius:50%; width:160px; height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; margin:0 auto 14px; }
+  .photo-upload-zone { border:2px dashed rgba(200,169,110,.4); border-radius:50%; width:160px; height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; margin:0 auto; }
   .photo-upload-zone:active { background:rgba(200,169,110,.06); }
-  .photo-upload-emoji { font-size:40px; margin-bottom:8px; }
-  .photo-upload-hint { font-size:13px; color:rgba(255,255,255,.4); margin-bottom:12px; }
   .photo-upload-btn-inner { display:inline-block; padding:8px 22px; background:var(--dark-brown); border-radius:20px; color:var(--gold); font-size:13px; font-weight:700; }
-  .photo-preview-area { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; width:100%; margin-bottom:14px; }
-  .photo-preview-area img { width:140px; height:140px; border-radius:50%; object-fit:cover; display:block; border:3px solid var(--gold); }
+  .photo-slot { width:160px; height:160px; margin:28px auto; display:flex; align-items:center; justify-content:center; }
+  .photo-preview-area { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; width:160px; height:160px; margin:0 auto; }
+  .photo-preview-area img { width:160px; height:160px; border-radius:50%; object-fit:cover; display:block; border:3px solid var(--gold); }
   .photo-redo-btn { margin-top:10px; position:static; padding:6px 14px; background:rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.4); border-radius:20px; color:#fff; font-family:inherit; font-size:11px; cursor:pointer; }
   /* STEP 2 */
   .input-wrap textarea { width:100%; padding:14px 18px; background:rgba(255,255,255,.09); border:1px solid rgba(200,169,110,.3); border-radius:var(--radius); color:#fff; font-family:inherit; font-size:14px; outline:none; resize:none; -webkit-appearance:none; }
@@ -246,23 +245,18 @@
 <div id="screen-login" class="screen">
   <div class="login-box">
 
-    <!-- 단계 표시 -->
-    <div class="step-dots">
-      <div class="step-dot active" id="sdot-1"></div>
-      <div class="step-dot" id="sdot-2"></div>
-      <div class="step-dot" id="sdot-3"></div>
-    </div>
-
     <!-- STEP 1: 사진 선택 -->
     <div id="pane-step1">
       <h1 class="login-title">프로필 사진 선택</h1>
       <input type="file" id="inp-photo" accept="image/*" class="hidden-file">
-      <div id="photo-upload-zone" class="photo-upload-zone">
-        <div class="photo-upload-btn-inner">사진 선택</div>
-      </div>
-      <div id="photo-preview-area" class="photo-preview-area" style="display:none">
-        <img id="photo-preview-img" src="" alt="프로필 사진">
-        <button class="photo-redo-btn" id="btn-photo-redo">다시 선택</button>
+      <div class="photo-slot">
+        <div id="photo-upload-zone" class="photo-upload-zone">
+          <div class="photo-upload-btn-inner">사진 선택</div>
+        </div>
+        <div id="photo-preview-area" class="photo-preview-area" style="display:none">
+          <img id="photo-preview-img" src="" alt="프로필 사진">
+          <button class="photo-redo-btn" id="btn-photo-redo">다시 선택</button>
+        </div>
       </div>
       <button class="btn-primary" id="btn-step1-next">다음 →</button>
       <div class="login-error" id="err-step1"></div>
