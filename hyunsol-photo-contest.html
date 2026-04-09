@@ -527,7 +527,11 @@
       var val = snapshot.val();
       if (val) _appData = val;
       if (!currentUser) return;
-      renderAll();
+      if (currentUser.isAdmin) {
+        try { renderAdmin(); } catch(e) {}
+      } else {
+        renderAll();
+      }
     });
   }
 
@@ -923,7 +927,7 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
     var totalMissions = 0;
     for (var i = 0; i < keys.length; i++) {
       var nick = keys[i];
-      var ms = users[nick].missions;
+      var ms = normalizeMissions(users[nick].missions);
       var cnt = 0;
       for (var j = 0; j < ms.length; j++) if (ms[j]) cnt++;
       totalMissions += cnt;
