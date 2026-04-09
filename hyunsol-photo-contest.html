@@ -1078,26 +1078,39 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
   }
 
   /* ── 참여자 탭 렌더 ── */
+  function normalizeMissions(ms) {
+    var arr = [false,false,false,false,false];
+    if (!ms) return arr;
+    if (Array.isArray(ms)) {
+      for (var i=0;i<5;i++) arr[i] = ms[i] || false;
+    } else if (typeof ms === 'object') {
+      for (var j=0;j<5;j++) arr[j] = ms[j] || false;
+    }
+    return arr;
+  }
+
   function renderPeople() {
     var d = getData();
     var users = d.users || {};
     var keys = Object.keys(users);
     var wrap = document.getElementById('people-wrap');
+    if (!wrap) return;
     wrap.innerHTML = '';
     if (!keys.length) {
       wrap.innerHTML = '<div class="no-data">아직 참여자가 없습니다.</div>';
       return;
     }
+    var anyShown = false;
     for (var gi = 0; gi < GROUPS.length; gi++) {
       (function (grpName) {
         var members = [];
         for (var k = 0; k < keys.length; k++) {
           var u = users[keys[k]];
-          if (u.group === grpName) {
-            var cnt = 0;
-            for (var m = 0; m < u.missions.length; m++) if (u.missions[m]) cnt++;
-            members.push({ nick: keys[k], missions: u.missions, count: cnt, photo: u.photo || '' });
-          }
+          if (!u || u.group !== grpName) continue;
+          var ms = normalizeMissions(u.missions);
+          var cnt = 0;
+          for (var m = 0; m < ms.length; m++) if (ms[m]) cnt++;
+          members.push({ nick: keys[k], missions: ms, count: cnt, photo: u.photo || '' });
         }
         if (!members.length) return;
         var card = document.createElement('div');
@@ -1123,9 +1136,10 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
         }
         card.appendChild(grid);
         wrap.appendChild(card);
+        anyShown = true;
       })(GROUPS[gi]);
     }
-    if (!wrap.children.length) {
+    if (!anyShown) {
       wrap.innerHTML = '<div class="no-data">아직 참여자가 없습니다.</div>';
     }
   }
