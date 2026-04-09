@@ -539,9 +539,6 @@
     document.getElementById('pane-step1').style.display = step === 1 ? 'block' : 'none';
     document.getElementById('pane-step2').style.display = step === 2 ? 'block' : 'none';
     document.getElementById('pane-step3').style.display = step === 3 ? 'block' : 'none';
-    ['sdot-1','sdot-2','sdot-3'].forEach(function(id, i) {
-      document.getElementById(id).classList.toggle('active', i + 1 === step);
-    });
   }
 
   /* Step 1: 사진 선택 */
