@@ -49,7 +49,7 @@
   .photo-upload-emoji { font-size:40px; margin-bottom:8px; }
   .photo-upload-hint { font-size:13px; color:rgba(255,255,255,.4); margin-bottom:12px; }
   .photo-upload-btn-inner { display:inline-block; padding:8px 22px; background:var(--dark-brown); border-radius:20px; color:var(--gold); font-size:13px; font-weight:700; }
-  .photo-preview-area { position:relative; display:flex; flex-direction:column; align-items:center; margin-bottom:14px; }
+  .photo-preview-area { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; width:100%; margin-bottom:14px; }
   .photo-preview-area img { width:140px; height:140px; border-radius:50%; object-fit:cover; display:block; border:3px solid var(--gold); }
   .photo-redo-btn { margin-top:10px; position:static; padding:6px 14px; background:rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.4); border-radius:20px; color:#fff; font-family:inherit; font-size:11px; cursor:pointer; }
   /* STEP 2 */
@@ -255,11 +255,9 @@
 
     <!-- STEP 1: 사진 선택 -->
     <div id="pane-step1">
-      <h1 class="login-title">프로필 사진<br>선택하기 📷</h1>
+      <h1 class="login-title">프로필 사진 선택</h1>
       <input type="file" id="inp-photo" accept="image/*" class="hidden-file">
       <div id="photo-upload-zone" class="photo-upload-zone">
-        <div class="photo-upload-emoji">📷</div>
-        <div class="photo-upload-hint">사진을 눌러 선택해주세요</div>
         <div class="photo-upload-btn-inner">사진 선택</div>
       </div>
       <div id="photo-preview-area" class="photo-preview-area" style="display:none">
