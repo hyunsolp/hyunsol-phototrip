@@ -499,6 +499,10 @@
     <!-- 참여자관리 패널 -->
     <div class="admin-panel" id="apanel-participant">
       <div class="admin-sec">
+        <div class="admin-sec-title">👥 참여자 현황</div>
+        <div id="admin-people-wrap"></div>
+      </div>
+      <div class="admin-sec">
         <div class="admin-sec-title">🏆 참여자 순위</div>
         <div id="admin-rank"></div>
       </div>
@@ -716,7 +720,7 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
     document.getElementById('photo-preview-area').style.display = 'none';
     document.getElementById('photo-preview-img').src = '';
     setOnboardStep(1);
-    showScreen('screen-login');
+    showScreen('screen-intro');
     setActiveTab('home');
   }
   document.getElementById('btn-logout-app').addEventListener('click', doLogout);
@@ -1062,6 +1066,39 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
         })(entries[ti]);
       }
     }
+
+    /* ── 참여자 현황 (조별 사진+닉네임 그리드) ── */
+    var adminPeopleWrap = document.getElementById('admin-people-wrap');
+    adminPeopleWrap.innerHTML = '';
+    var anyPeople = false;
+    for (var apgi = 0; apgi < GROUPS.length; apgi++) {
+      (function(grpName) {
+        var grpMembers = entries.filter(function(e) { return e.group === grpName; });
+        if (!grpMembers.length) return;
+        anyPeople = true;
+        var card = document.createElement('div');
+        card.className = 'people-card';
+        card.innerHTML = '<div class="people-card-head">' +
+          '<span class="people-card-title">' + esc(grpName) + '</span>' +
+          '<span class="people-card-sub">👥 ' + grpMembers.length + '명</span></div>';
+        var grid = document.createElement('div');
+        grid.className = 'people-grid';
+        for (var apmi = 0; apmi < grpMembers.length; apmi++) {
+          var apm = grpMembers[apmi];
+          var u = (getData().users || {})[apm.nick] || {};
+          var memDiv = document.createElement('div');
+          memDiv.className = 'people-member';
+          var photoHtml = u.photo
+            ? '<img class="people-photo" src="' + u.photo + '" alt="' + esc(apm.nick) + '">'
+            : '<div class="people-photo-placeholder">' + esc(apm.nick.charAt(0).toUpperCase()) + '</div>';
+          memDiv.innerHTML = photoHtml + '<div class="people-nick">' + esc(apm.nick) + '</div>';
+          grid.appendChild(memDiv);
+        }
+        card.appendChild(grid);
+        adminPeopleWrap.appendChild(card);
+      })(GROUPS[apgi]);
+    }
+    if (!anyPeople) adminPeopleWrap.innerHTML = '<div class="no-data">아직 참여자가 없습니다.</div>';
 
     /* ── 참여자 순위 (참여자 삭제 버튼 포함) ── */
     var rankEl = document.getElementById('admin-rank');
