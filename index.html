@@ -105,6 +105,8 @@
   .topbar-user { display:flex; align-items:center; gap:8px; }
   .topbar-nickname { color:var(--gold-light); font-size:13px; font-weight:500; }
   .btn-logout { padding:6px 12px; background:transparent; border:1px solid rgba(200,169,110,.4); border-radius:20px; color:rgba(255,255,255,.6); font-family:inherit; font-size:11px; cursor:pointer; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spinning { animation:spin .7s linear infinite; }
   .content { flex:1; padding-bottom:80px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:var(--dark-brown); display:flex; border-top:1px solid rgba(200,169,110,.2); z-index:100; padding-bottom:env(safe-area-inset-bottom); padding-top:8px; align-items:flex-end; }
   .nav-btn { flex:1; padding:10px 8px 12px; display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none; border-top:2px solid transparent; color:rgba(255,255,255,.4); font-family:inherit; font-size:10px; cursor:pointer; transition:transform .2s ease, background .2s ease, color .2s ease; border-radius:10px 10px 0 0; }
@@ -745,19 +747,20 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
   });
   document.getElementById('btn-admin-refresh').addEventListener('click', function () {
     var btn = this;
-    btn.textContent = '⏳';
+    btn.classList.add('spinning');
     btn.disabled = true;
-    window._fbGet(window._fbRef).then(function(snapshot) {
-      var val = snapshot.val();
-      if (val) _appData = val;
+    function done() { btn.classList.remove('spinning'); btn.disabled = false; }
+    if (window._fbGet && window._fbRef) {
+      window._fbGet(window._fbRef).then(function(snapshot) {
+        var val = snapshot.val();
+        if (val) _appData = val;
+        renderAdmin();
+        done();
+      }).catch(function() { renderAdmin(); done(); });
+    } else {
       renderAdmin();
-      btn.textContent = '↻';
-      btn.disabled = false;
-    }).catch(function() {
-      renderAdmin();
-      btn.textContent = '↻';
-      btn.disabled = false;
-    });
+      setTimeout(done, 500);
+    }
   });
 
   /* ── 관리자 탭 전환 ── */
