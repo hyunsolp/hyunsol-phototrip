@@ -989,7 +989,7 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
         var grpDone = members.reduce(function (s, e) { return s + e.count; }, 0);
         grpCard.innerHTML = '<div class="group-card-head">' +
           '<span class="group-card-title">' + esc(grpName) + '</span>' +
-          '<span class="group-card-badge">👥 ' + members.length + '명 · ✅ ' + grpDone + '/' + (members.length * 5) + '</span>' +
+          '<span class="group-card-badge">👥 ' + members.length + '명 · ✅ ' + grpDone + '/10</span>' +
           '</div>';
         if (!members.length) {
           grpCard.innerHTML += '<div style="padding:12px 16px;font-size:12px;color:var(--text-muted);">참여자 없음</div>';
