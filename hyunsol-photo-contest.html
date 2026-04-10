@@ -456,6 +456,7 @@
     <span class="admin-bar-title">🛠 관리자 대시보드</span>
     <div style="display:flex;align-items:center;gap:8px;">
       <span style="background:var(--gold);color:var(--dark-brown);font-size:11px;font-weight:900;padding:4px 10px;border-radius:20px;">관리자</span>
+      <button id="btn-admin-refresh" style="background:transparent;border:1px solid rgba(200,169,110,.5);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:var(--gold);font-size:15px;">↻</button>
       <button class="btn-logout" id="btn-logout-admin">로그아웃</button>
     </div>
   </div>
@@ -731,6 +732,9 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
   document.getElementById('btn-logout-admin').addEventListener('click', function () {
     currentUser = null;
     showScreen('screen-intro');
+  });
+  document.getElementById('btn-admin-refresh').addEventListener('click', function () {
+    renderAdmin();
   });
 
   /* ── 관리자 탭 전환 ── */
