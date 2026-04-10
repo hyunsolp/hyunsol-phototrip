@@ -123,10 +123,11 @@
   .progress-fill { height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-light)); border-radius:40px; transition:width .4s; }
   .progress-text { font-size:12px; color:var(--text-muted); margin-bottom:16px; }
   .mini-list { display:flex; flex-direction:column; gap:7px; }
-  .mini-item { display:flex; align-items:center; gap:10px; padding:11px 14px; background:#fff; border-radius:var(--radius-sm); }
-  .mini-num { width:26px; height:26px; border-radius:50%; background:var(--cream); border:1.5px solid var(--gold-light); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--mid-brown); flex-shrink:0; }
+  .mini-item { display:flex; align-items:flex-start; gap:10px; padding:11px 14px; background:#fff; border-radius:var(--radius-sm); }
+  .mini-num { width:26px; height:26px; border-radius:50%; background:var(--cream); border:1.5px solid var(--gold-light); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--mid-brown); flex-shrink:0; margin-top:1px; }
   .mini-num.done { background:var(--clear-green); border-color:var(--clear-green); color:#fff; }
-  .mini-name { flex:1; font-size:13px; }
+  .mini-name { flex:1; font-size:13px; font-weight:600; color:var(--dark-brown); line-height:1.3; }
+  .mini-desc { font-size:11px; color:rgba(0,0,0,.42); margin-top:3px; line-height:1.4; }
   .clear-badge { font-size:10px; font-weight:700; padding:2px 9px; border-radius:20px; background:var(--clear-light); color:var(--clear-green); }
 
   /* MISSIONS */
@@ -134,7 +135,8 @@
   .m-head { padding:16px 18px 12px; display:flex; align-items:flex-start; gap:12px; }
   .m-badge { width:34px; height:34px; border-radius:9px; background:var(--dark-brown); color:var(--gold); font-size:15px; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .m-badge.done { background:var(--clear-green); color:#fff; }
-  .m-title { font-size:14px; font-weight:700; padding-top:7px; line-height:1.4; }
+  .m-title { font-size:14px; font-weight:700; padding-top:4px; line-height:1.4; }
+  .m-desc { font-size:11px; color:rgba(0,0,0,.42); margin-top:4px; line-height:1.5; }
   .m-body { padding:0 18px 16px; }
 
   /* upload zone */
@@ -535,10 +537,17 @@
   var ADMIN_PW = 'adgjl7';
   var MISSIONS = [
     '우리팀의 단합된 모습',
-    '우리 조원의 사진',
+    '우리 조원의 사진 담아주기',
     '내가 바라본 오늘의 색상',
-    '사물과 풍경_사진',
-    '자연과 동물_사진'
+    '사물과 풍경&사진',
+    '자연과 동물 사진'
+  ];
+  var MISSION_DESCS = [
+    '서로의 손을 맞대거나, 같은 포즈로 우리 팀만의 모습을 담아주세요!',
+    '오늘 함께 걷는 소중한 동료의 가장 환한 미소를 멋지게 기록해 주세요.',
+    '지금 내 눈길을 사로잡은 가장 매력적인 색깔 하나를 찾아보세요.',
+    '거리 위 무심한 사물과 풍경이 어우러진 감성적인 찰나를 포착해 보세요.',
+    '길가에 핀 작은 꽃이나 우연히 만난 귀여운 동물의 순간을 담아볼까요?'
   ];
   var GROUPS = ['1조', '2조', '3조', '4조'];
 
@@ -809,7 +818,7 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
       var isDone = !!ms[j];
       html += '<div class="mini-item">' +
         '<div class="mini-num' + (isDone ? ' done' : '') + '">' + (isDone ? '✓' : (j + 1)) + '</div>' +
-        '<div class="mini-name">' + esc(MISSIONS[j]) + '</div>' +
+        '<div style="flex:1"><div class="mini-name">' + esc(MISSIONS[j]) + '</div><div class="mini-desc">' + esc(MISSION_DESCS[j]) + '</div></div>' +
         (isDone ? '<span class="clear-badge">CLEAR</span>' : '') +
         '</div>';
     }
@@ -829,7 +838,7 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
       html += '<div class="mission-card">' +
         '<div class="m-head">' +
         '<div class="m-badge' + (isDone ? ' done' : '') + '">' + (isDone ? '✓' : (i + 1)) + '</div>' +
-        '<div class="m-title">' + esc(MISSIONS[i]) + '</div>' +
+        '<div><div class="m-title">' + esc(MISSIONS[i]) + '</div><div class="m-desc">' + esc(MISSION_DESCS[i]) + '</div></div>' +
         '</div><div class="m-body">';
       if (isDone) {
         html += '<div class="preview-wrap">' +
