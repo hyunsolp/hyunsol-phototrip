@@ -743,7 +743,20 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
     showScreen('screen-intro');
   });
   document.getElementById('btn-admin-refresh').addEventListener('click', function () {
-    renderAdmin();
+    var btn = this;
+    btn.textContent = '⏳';
+    btn.disabled = true;
+    window._fbGet(window._fbRef).then(function(snapshot) {
+      var val = snapshot.val();
+      if (val) _appData = val;
+      renderAdmin();
+      btn.textContent = '↻';
+      btn.disabled = false;
+    }).catch(function() {
+      renderAdmin();
+      btn.textContent = '↻';
+      btn.disabled = false;
+    });
   });
 
   /* ── 관리자 탭 전환 ── */
