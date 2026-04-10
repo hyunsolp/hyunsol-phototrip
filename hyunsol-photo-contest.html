@@ -190,11 +190,14 @@
   .ds.on { background:var(--clear-green); border-color:var(--clear-green); cursor:pointer; }
   .ds.on:hover { transform:scale(1.4); transition:transform .15s; }
   /* 사진 모달 */
-  .photo-modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:999; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+  .photo-modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:999; align-items:center; justify-content:center; flex-direction:column; gap:14px; }
   .photo-modal-bg.open { display:flex; }
-  .photo-modal-img { max-width:90vw; max-height:75vh; border-radius:12px; object-fit:contain; border:2px solid var(--gold); }
+  .photo-modal-img { max-width:88vw; max-height:68vh; border-radius:12px; object-fit:contain; border:2px solid var(--gold); }
   .photo-modal-info { color:#fff; font-size:13px; font-weight:700; text-align:center; }
-  .photo-modal-close { padding:10px 28px; background:var(--gold); border:none; border-radius:20px; color:var(--dark-brown); font-family:inherit; font-size:14px; font-weight:900; cursor:pointer; }
+  .photo-modal-nav { display:flex; align-items:center; gap:16px; }
+  .photo-modal-arrow { width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.15); border:1.5px solid rgba(255,255,255,.3); color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .photo-modal-arrow:disabled { opacity:.25; cursor:default; }
+  .photo-modal-close { padding:10px 32px; background:var(--gold); border:none; border-radius:20px; color:var(--dark-brown); font-family:inherit; font-size:14px; font-weight:900; cursor:pointer; }
 
   /* ADMIN TABS */
   .admin-stats { display:flex; gap:10px; margin-bottom:18px; }
@@ -278,6 +281,17 @@
 </style>
 </head>
 <body>
+
+<!-- 미션 사진 모달 -->
+<div class="photo-modal-bg" id="photo-modal">
+  <div class="photo-modal-info" id="photo-modal-info"></div>
+  <img class="photo-modal-img" id="photo-modal-img" src="" alt="">
+  <div class="photo-modal-nav">
+    <button class="photo-modal-arrow" id="photo-modal-prev">&#8592;</button>
+    <button class="photo-modal-close" id="photo-modal-close">닫기</button>
+    <button class="photo-modal-arrow" id="photo-modal-next">&#8594;</button>
+  </div>
+</div>
 
 <!-- INTRO -->
 <div id="screen-intro" class="screen active">
@@ -1176,17 +1190,43 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
     }
   }
 
-  /* ── 미션 사진 모달 공통 함수 ── */
+  /* ── 미션 사진 모달 ── */
+  var _modalNick = '';
+  var _modalIdx = 0;
+
   function openPhotoModal(nick, idx) {
     var d = getData();
     if (!d.users || !d.users[nick]) return;
     var ms = normalizeMissions(d.users[nick].missions);
     var photo = ms[idx];
     if (!photo) return;
+    _modalNick = nick;
+    _modalIdx = idx;
     document.getElementById('photo-modal-info').textContent = nick + ' · 미션 ' + (idx + 1) + ' — ' + MISSIONS[idx];
     document.getElementById('photo-modal-img').src = photo;
     document.getElementById('photo-modal').classList.add('open');
+    /* 이전/다음 버튼 활성화 여부 */
+    var prevIdx = -1, nextIdx = -1;
+    for (var i = idx - 1; i >= 0; i--) { if (ms[i]) { prevIdx = i; break; } }
+    for (var j = idx + 1; j < 5; j++) { if (ms[j]) { nextIdx = j; break; } }
+    document.getElementById('photo-modal-prev').disabled = prevIdx < 0;
+    document.getElementById('photo-modal-next').disabled = nextIdx < 0;
   }
+
+  document.getElementById('photo-modal-close').addEventListener('click', function() {
+    document.getElementById('photo-modal').classList.remove('open');
+  });
+  document.getElementById('photo-modal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+  document.getElementById('photo-modal-prev').addEventListener('click', function() {
+    var ms = normalizeMissions(getData().users[_modalNick].missions);
+    for (var i = _modalIdx - 1; i >= 0; i--) { if (ms[i]) { openPhotoModal(_modalNick, i); break; } }
+  });
+  document.getElementById('photo-modal-next').addEventListener('click', function() {
+    var ms = normalizeMissions(getData().users[_modalNick].missions);
+    for (var j = _modalIdx + 1; j < 5; j++) { if (ms[j]) { openPhotoModal(_modalNick, j); break; } }
+  });
 
   /* 미션 현황표 점 클릭 */
   document.getElementById('admin-tbody').addEventListener('click', function(e) {
@@ -1201,19 +1241,8 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
     if (!slot) return;
     openPhotoModal(slot.getAttribute('data-nick'), parseInt(slot.getAttribute('data-idx')));
   });
-  document.getElementById('photo-modal-close').addEventListener('click', function() {
-    document.getElementById('photo-modal').classList.remove('open');
-  });
-  document.getElementById('photo-modal').addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('open');
-  });
 
 })();
 </script>
-<div class="photo-modal-bg" id="photo-modal">
-  <div class="photo-modal-info" id="photo-modal-info"></div>
-  <img class="photo-modal-img" id="photo-modal-img" src="" alt="">
-  <button class="photo-modal-close" id="photo-modal-close">닫기</button>
-</div>
 </body>
 </html>
