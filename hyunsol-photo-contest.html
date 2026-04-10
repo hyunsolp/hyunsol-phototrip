@@ -489,6 +489,7 @@
             <thead><tr>
               <th>참여자</th><th class="tc">조</th>
               <th class="tc">①</th><th class="tc">②</th><th class="tc">③</th><th class="tc">④</th><th class="tc">⑤</th>
+              <th class="tc">완료</th>
               <th class="tc">관리</th>
             </tr></thead>
             <tbody id="admin-tbody"></tbody>
@@ -1040,15 +1041,16 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
 
     /* ── 미션 현황표 ── */
     var tbody = document.getElementById('admin-tbody');
-    if (!entries.length) { tbody.innerHTML = '<tr><td colspan="8" class="tc no-data">참여자 없음</td></tr>'; }
+    if (!entries.length) { tbody.innerHTML = '<tr><td colspan="9" class="tc no-data">참여자 없음</td></tr>'; }
     else {
       tbody.innerHTML = '';
       for (var ti = 0; ti < entries.length; ti++) {
         (function (et) {
           var tr = document.createElement('tr');
-          var cells = '<td><div style="display:flex;align-items:center;gap:6px;"><strong style="font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--dark-brown);">' + esc(et.nick) + '</strong><span style="font-size:10px;font-weight:700;color:var(--gold);background:var(--dark-brown);padding:2px 7px;border-radius:10px;white-space:nowrap;">' + et.count + '</span></div></td>';
+          var cells = '<td><strong style="font-size:12px;font-weight:700;letter-spacing:.3px;color:var(--dark-brown);">' + esc(et.nick) + '</strong></td>';
           cells += '<td class="tc"><span style="font-size:11px;color:var(--mid-brown);font-weight:700;white-space:nowrap;">' + esc(et.group || '-') + '</span></td>';
           for (var m = 0; m < 5; m++) cells += '<td class="tc"><span class="ds' + (et.missions[m] ? ' on" data-photo="' + m + '" data-nick="' + esc(et.nick) + '"' : '') + '"></span></td>';
+          cells += '<td class="tc"><strong style="font-size:13px;color:var(--dark-brown);">' + et.count + '</strong></td>';
           cells += '<td class="tc"></td>';
           tr.innerHTML = cells;
           var resetBtn = document.createElement('button');
