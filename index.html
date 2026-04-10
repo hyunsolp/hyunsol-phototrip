@@ -296,7 +296,10 @@
 
     <!-- STEP 1: 사진 선택 -->
     <div id="pane-step1">
-      <h1 class="login-title">프로필 사진 선택</h1>
+      <h1 class="login-title" style="display:flex;align-items:center;justify-content:center;gap:10px;">
+        <svg width="28" height="28" viewBox="0 0 44 44" fill="none"><rect x="8" y="10" width="28" height="22" rx="4" stroke="#c8a96e" stroke-width="2.5"/><circle cx="22" cy="21" r="7" stroke="#c8a96e" stroke-width="2.5"/><circle cx="22" cy="21" r="3" fill="#c8a96e"/><rect x="17" y="7" width="10" height="5" rx="2" fill="#c8a96e"/></svg>
+        프로필 사진 선택
+      </h1>
       <input type="file" id="inp-photo" accept="image/*" class="hidden-file">
       <div class="photo-slot">
         <div id="photo-upload-zone" class="photo-upload-zone">
@@ -314,7 +317,7 @@
 
     <!-- STEP 2: 닉네임 + 참여한계기 + 조 선택 -->
     <div id="pane-step2" style="display:none">
-      <h1 class="login-title">나를<br>소개해요 👋</h1>
+      <h1 class="login-title">나를 소개해요 👋</h1>
       <div class="input-wrap">
         <label class="field-label">📌 닉네임 *</label>
         <input type="text" id="inp-nick" placeholder="닉네임을 입력하세요" maxlength="20" autocomplete="off">
@@ -336,8 +339,7 @@
 
     <!-- STEP 3: 아이스브레이킹 -->
     <div id="pane-step3" style="display:none">
-      <h1 class="login-title">오늘의 대화<br>주제 🗣️</h1>
-      <p class="onboard-sublabel" style="text-align:center;margin-bottom:18px;">아이스브레이킹</p>
+      <h1 class="login-title">오늘의 대화 주제 🗣️</h1>
       <div class="icebreak-card">
         <div class="icebreak-label">Q1</div>
         <div class="icebreak-q">나의 MBTI는?</div>
