@@ -247,7 +247,8 @@
   .people-card-title { color:var(--gold); font-size:14px; font-weight:900; }
   .people-card-sub { color:var(--gold-light); font-size:11px; }
   .people-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; padding:16px; }
-  .people-member { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .people-member { display:flex; flex-direction:column; align-items:center; gap:6px; position:relative; }
+  .people-del-btn { position:absolute; top:0; right:calc(50% - 42px); width:20px; height:20px; border-radius:50%; background:#e53935; border:none; color:#fff; font-size:12px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; z-index:10; padding:0; box-shadow:0 1px 4px rgba(0,0,0,.3); }
   .people-photo { width:70px; height:70px; border-radius:50%; object-fit:cover; border:2.5px solid var(--gold); }
   .people-photo-placeholder { width:70px; height:70px; border-radius:50%; background:var(--dark-brown); border:2.5px solid var(--gold); display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:22px; font-weight:900; }
   .people-nick { font-size:12px; font-weight:700; color:#333; text-align:center; }
@@ -1114,15 +1115,31 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
         var grid = document.createElement('div');
         grid.className = 'people-grid';
         for (var apmi = 0; apmi < grpMembers.length; apmi++) {
-          var apm = grpMembers[apmi];
-          var u = (getData().users || {})[apm.nick] || {};
-          var memDiv = document.createElement('div');
-          memDiv.className = 'people-member';
-          var photoHtml = u.photo
-            ? '<img class="people-photo" src="' + u.photo + '" alt="' + esc(apm.nick) + '">'
-            : '<div class="people-photo-placeholder">' + esc(apm.nick.charAt(0).toUpperCase()) + '</div>';
-          memDiv.innerHTML = photoHtml + '<div class="people-nick">' + esc(apm.nick) + '</div>';
-          grid.appendChild(memDiv);
+          (function(member) {
+            var u = (getData().users || {})[member.nick] || {};
+            var memDiv = document.createElement('div');
+            memDiv.className = 'people-member';
+            var photoHtml = u.photo
+              ? '<img class="people-photo" src="' + u.photo + '" alt="' + esc(member.nick) + '">'
+              : '<div class="people-photo-placeholder">' + esc(member.nick.charAt(0).toUpperCase()) + '</div>';
+            memDiv.innerHTML = photoHtml + '<div class="people-nick">' + esc(member.nick) + '</div>';
+            var delBtn = document.createElement('button');
+            delBtn.className = 'people-del-btn';
+            delBtn.textContent = '×';
+            delBtn.title = member.nick + ' 삭제';
+            delBtn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              if (!confirm(esc(member.nick) + '님을 삭제할까요?')) return;
+              var dd = getData();
+              if (dd.users && dd.users[member.nick]) {
+                delete dd.users[member.nick];
+                saveData(dd);
+              }
+              renderAdmin();
+            });
+            memDiv.appendChild(delBtn);
+            grid.appendChild(memDiv);
+          })(grpMembers[apmi]);
         }
         card.appendChild(grid);
         adminPeopleWrap.appendChild(card);
