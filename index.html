@@ -310,7 +310,7 @@
 
     <!-- STEP 1: 사진 선택 -->
     <div id="pane-step1">
-      <h1 class="login-title">🖼️ 프로필 사진 선택</h1>
+      <h1 class="login-title">프로필 사진 선택 🖼️</h1>
       <input type="file" id="inp-photo" accept="image/*" class="hidden-file">
       <div class="photo-slot">
         <div id="photo-upload-zone" class="photo-upload-zone">
@@ -346,6 +346,7 @@
       </div>
       <button class="btn-primary" id="btn-step2-next">다음 →</button>
       <div class="login-error" id="err-step2"></div>
+      <button class="btn-admin-link" id="btn-step2-back" style="margin-top:8px;">← 뒤로 가기</button>
     </div>
 
     <!-- STEP 3: 아이스브레이킹 -->
@@ -659,6 +660,9 @@
   });
   document.getElementById('btn-step1-home').addEventListener('click', function () {
     showScreen('screen-intro');
+  });
+  document.getElementById('btn-step2-back').addEventListener('click', function () {
+    setOnboardStep(1);
   });
 
   /* Step 2: 닉네임 + 계기 + 조 */
