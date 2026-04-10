@@ -690,6 +690,11 @@
     var nn = document.getElementById('inp-nick').value.trim();
     if (!nn) { document.getElementById('err-step2').textContent = '닉네임을 입력해주세요!'; return; }
     if (!selectedGroup) { document.getElementById('err-step2').textContent = '조를 선택해주세요!'; return; }
+    var d = getData();
+    if (d.users && d.users[nn]) {
+      document.getElementById('err-step2').textContent = '이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요!';
+      return;
+    }
     document.getElementById('err-step2').textContent = '';
     setOnboardStep(3);
   });
@@ -736,6 +741,7 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
     document.getElementById('photo-upload-zone').style.display = 'block';
     document.getElementById('photo-preview-area').style.display = 'none';
     document.getElementById('photo-preview-img').src = '';
+    document.getElementById('inp-photo').value = '';
     setOnboardStep(1);
     showScreen('screen-intro');
     setActiveTab('home');
