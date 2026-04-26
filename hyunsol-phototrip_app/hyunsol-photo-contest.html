@@ -114,6 +114,29 @@
   .nav-btn svg { width:20px; height:20px; }
   .tab-panel { display:none; padding:18px; }
   .tab-panel.active { display:block; }
+  /* GPS TAB */
+  .gps-card { background:#fff; border-radius:var(--radius); margin-bottom:14px; overflow:hidden; border:1px solid rgba(0,0,0,.07); }
+  .gps-card-head { background:var(--dark-brown); padding:12px 16px; color:var(--gold); font-size:13px; font-weight:700; }
+  .gps-card-body { padding:16px; }
+  .btn-gps { width:100%; padding:13px; border:none; border-radius:var(--radius-sm); font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:8px; }
+  .btn-gps-primary { background:var(--gold); color:var(--dark-brown); }
+  .btn-gps-outline { background:transparent; border:1.5px solid var(--gold); color:var(--dark-brown); }
+  .gps-map { width:100%; height:200px; border-radius:var(--radius-sm); border:1px solid rgba(0,0,0,.1); margin:10px 0; }
+  .gps-addr-box { font-size:12px; color:var(--dark-brown); line-height:1.6; padding:10px 12px; background:rgba(200,169,110,.1); border-radius:8px; margin-bottom:10px; border-left:3px solid var(--gold); }
+  .gps-search-row { display:flex; gap:8px; margin-bottom:10px; }
+  .gps-search-inp { flex:1; padding:10px 12px; border:1.5px solid rgba(0,0,0,.12); border-radius:var(--radius-sm); font-family:inherit; font-size:14px; outline:none; background:#fff; }
+  .gps-search-inp:focus { border-color:var(--gold); }
+  .btn-gps-do-search { padding:10px 14px; background:var(--dark-brown); color:var(--gold); border:none; border-radius:var(--radius-sm); font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .gps-result-item { padding:12px 16px; border-bottom:1px solid rgba(0,0,0,.06); cursor:pointer; }
+  .gps-result-item:last-child { border-bottom:none; }
+  .gps-result-name { font-size:13px; font-weight:700; color:var(--dark-brown); margin-bottom:2px; }
+  .gps-result-detail { font-size:11px; color:var(--text-muted); }
+  .gps-saved-item { padding:12px 16px; border-bottom:1px solid rgba(0,0,0,.06); display:flex; align-items:flex-start; gap:10px; }
+  .gps-saved-item:last-child { border-bottom:none; }
+  .gps-saved-info { flex:1; }
+  .gps-saved-addr { font-size:13px; color:var(--dark-brown); font-weight:600; margin-bottom:2px; }
+  .gps-saved-time { font-size:11px; color:var(--text-muted); }
+  .gps-status-msg { font-size:12px; color:var(--text-muted); text-align:center; padding:12px 0; }
 
   /* HOME */
   .home-hero { background:var(--dark-brown); border-radius:var(--radius); padding:24px 20px; margin-bottom:18px; }
@@ -420,6 +443,33 @@
       <div class="mini-list" id="home-list"></div>
     </div>
 
+    <div id="tab-gps" class="tab-panel">
+      <div class="gps-card">
+        <div class="gps-card-head">📍 현재 위치</div>
+        <div class="gps-card-body">
+          <button class="btn-gps btn-gps-primary" id="btn-gps-locate">📡 현재 위치 조회하기</button>
+          <div id="gps-status-msg" class="gps-status-msg" style="display:none"></div>
+          <iframe id="gps-map" class="gps-map" style="display:none" frameborder="0" scrolling="no" allowfullscreen></iframe>
+          <div id="gps-addr-box" class="gps-addr-box" style="display:none"></div>
+          <button class="btn-gps btn-gps-outline" id="btn-gps-save" style="display:none">💾 현재 위치 저장하기</button>
+        </div>
+      </div>
+      <div class="gps-card">
+        <div class="gps-card-head">🔍 위치 검색</div>
+        <div class="gps-card-body">
+          <div class="gps-search-row">
+            <input type="text" class="gps-search-inp" id="inp-gps-search" placeholder="장소명 또는 주소를 입력하세요" autocomplete="off">
+            <button class="btn-gps-do-search" id="btn-gps-search-go">검색</button>
+          </div>
+          <div id="gps-search-results"></div>
+        </div>
+      </div>
+      <div class="gps-card">
+        <div class="gps-card-head">📌 저장된 위치</div>
+        <div id="gps-saved-list"><div class="gps-status-msg" style="padding:16px;">저장된 위치가 없습니다.</div></div>
+      </div>
+    </div>
+
     <div id="tab-mission" class="tab-panel">
       <div id="mission-wrap"></div>
     </div>
@@ -441,6 +491,9 @@
   <div class="bottom-nav">
     <button class="nav-btn active" data-tab="home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>홈
+    </button>
+    <button class="nav-btn" data-tab="gps">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>GPS
     </button>
     <button class="nav-btn" data-tab="mission">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>미션
@@ -801,6 +854,7 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
       var name = this.getAttribute('data-tab');
       setActiveTab(name);
       if (name === 'home') renderHome();
+      if (name === 'gps') renderGpsSaved();
       if (name === 'mission') renderMissions();
       if (name === 'review') renderReviews();
       if (name === 'people') renderPeople();
@@ -1315,6 +1369,125 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
     if (!slot) return;
     openPhotoModal(slot.getAttribute('data-nick'), parseInt(slot.getAttribute('data-idx')));
   });
+
+  /* ── GPS 탭 ── */
+  var _gpsCoords = null;
+
+  function gpsShowMap(lat, lng) {
+    var bbox = (lng - 0.008) + ',' + (lat - 0.008) + ',' + (lng + 0.008) + ',' + (lat + 0.008);
+    var mapEl = document.getElementById('gps-map');
+    mapEl.src = 'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + lat + ',' + lng;
+    mapEl.style.display = 'block';
+  }
+
+  function gpsReverseGeocode(lat, lng, cb) {
+    fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng + '&format=json&accept-language=ko')
+      .then(function(r) { return r.json(); })
+      .then(function(data) { cb(data.display_name || ('위도 ' + lat.toFixed(5) + ', 경도 ' + lng.toFixed(5))); })
+      .catch(function() { cb('위도 ' + lat.toFixed(5) + ', 경도 ' + lng.toFixed(5)); });
+  }
+
+  document.getElementById('btn-gps-locate').addEventListener('click', function() {
+    var statusEl = document.getElementById('gps-status-msg');
+    if (!navigator.geolocation) {
+      statusEl.textContent = '이 브라우저는 GPS를 지원하지 않습니다.';
+      statusEl.style.display = 'block';
+      return;
+    }
+    statusEl.textContent = '📡 위치를 조회하는 중...';
+    statusEl.style.display = 'block';
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      var lat = pos.coords.latitude;
+      var lng = pos.coords.longitude;
+      _gpsCoords = { lat: lat, lng: lng };
+      statusEl.style.display = 'none';
+      gpsShowMap(lat, lng);
+      var addrEl = document.getElementById('gps-addr-box');
+      addrEl.textContent = '주소를 불러오는 중...';
+      addrEl.style.display = 'block';
+      gpsReverseGeocode(lat, lng, function(addr) {
+        addrEl.textContent = '📍 ' + addr;
+      });
+      document.getElementById('btn-gps-save').style.display = 'block';
+    }, function(err) {
+      var msgs = { 1: 'GPS 권한이 거부됐습니다. 브라우저 설정에서 위치 권한을 허용해주세요.', 2: '위치를 가져올 수 없습니다.', 3: '위치 조회 시간이 초과됐습니다.' };
+      statusEl.textContent = msgs[err.code] || '위치 조회에 실패했습니다.';
+    }, { timeout: 10000, enableHighAccuracy: true });
+  });
+
+  document.getElementById('btn-gps-save').addEventListener('click', function() {
+    if (!_gpsCoords || !currentUser) return;
+    var addr = document.getElementById('gps-addr-box').textContent.replace('📍 ', '');
+    var d = getData();
+    if (!d.users || !d.users[currentUser.nickname]) return;
+    if (!d.users[currentUser.nickname].locations) d.users[currentUser.nickname].locations = [];
+    d.users[currentUser.nickname].locations.push({ lat: _gpsCoords.lat, lng: _gpsCoords.lng, addr: addr, time: nowStr() });
+    saveData(d);
+    renderGpsSaved();
+    var btn = this;
+    btn.textContent = '✅ 저장됐습니다!';
+    setTimeout(function() { btn.textContent = '💾 현재 위치 저장하기'; }, 2000);
+  });
+
+  document.getElementById('btn-gps-search-go').addEventListener('click', function() {
+    var q = document.getElementById('inp-gps-search').value.trim();
+    if (!q) return;
+    var resultsEl = document.getElementById('gps-search-results');
+    resultsEl.innerHTML = '<div class="gps-status-msg">검색 중...</div>';
+    fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&accept-language=ko&limit=5&countrycodes=kr')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.length) { resultsEl.innerHTML = '<div class="gps-status-msg">검색 결과가 없습니다.</div>'; return; }
+        resultsEl.innerHTML = '';
+        for (var i = 0; i < data.length; i++) {
+          (function(item) {
+            var div = document.createElement('div');
+            div.className = 'gps-result-item';
+            var name = item.display_name.split(',')[0];
+            div.innerHTML = '<div class="gps-result-name">' + esc(name) + '</div><div class="gps-result-detail">' + esc(item.display_name) + '</div>';
+            div.addEventListener('click', function() {
+              var lat = parseFloat(item.lat);
+              var lng = parseFloat(item.lon);
+              _gpsCoords = { lat: lat, lng: lng };
+              gpsShowMap(lat, lng);
+              var addrEl = document.getElementById('gps-addr-box');
+              addrEl.textContent = '📍 ' + item.display_name;
+              addrEl.style.display = 'block';
+              document.getElementById('btn-gps-save').style.display = 'block';
+              document.getElementById('gps-status-msg').style.display = 'none';
+            });
+            resultsEl.appendChild(div);
+          })(data[i]);
+        }
+      })
+      .catch(function() { resultsEl.innerHTML = '<div class="gps-status-msg">검색에 실패했습니다. 잠시 후 다시 시도해주세요.</div>'; });
+  });
+
+  document.getElementById('inp-gps-search').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('btn-gps-search-go').click();
+  });
+
+  function renderGpsSaved() {
+    var savedEl = document.getElementById('gps-saved-list');
+    if (!currentUser || !getData().users || !getData().users[currentUser.nickname]) {
+      savedEl.innerHTML = '<div class="gps-status-msg" style="padding:16px;">저장된 위치가 없습니다.</div>';
+      return;
+    }
+    var locs = getData().users[currentUser.nickname].locations || [];
+    if (!locs.length) {
+      savedEl.innerHTML = '<div class="gps-status-msg" style="padding:16px;">저장된 위치가 없습니다.</div>';
+      return;
+    }
+    savedEl.innerHTML = '';
+    for (var i = locs.length - 1; i >= 0; i--) {
+      var loc = locs[i];
+      var div = document.createElement('div');
+      div.className = 'gps-saved-item';
+      div.innerHTML = '<span style="font-size:18px;flex-shrink:0;">📌</span>' +
+        '<div class="gps-saved-info"><div class="gps-saved-addr">' + esc(loc.addr) + '</div><div class="gps-saved-time">' + esc(loc.time) + '</div></div>';
+      savedEl.appendChild(div);
+    }
+  }
 
 })();
 </script>
