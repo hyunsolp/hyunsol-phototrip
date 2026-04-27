@@ -1387,14 +1387,20 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
       .catch(function() { cb('위도 ' + lat.toFixed(5) + ', 경도 ' + lng.toFixed(5)); });
   }
 
+  function gpsShowExternalBrowserGuide(statusEl) {
+    statusEl.innerHTML = '카카오톡 내 브라우저에서는 GPS가 제한될 수 있습니다.<br>' +
+      '아래 버튼을 눌러 <strong>외부 브라우저</strong>에서 열어주세요.<br><br>' +
+      '<button onclick="window.open(location.href,\'_blank\')" style="padding:8px 16px;background:var(--gold);color:var(--dark-brown);border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;">외부 브라우저로 열기</button>';
+    statusEl.style.display = 'block';
+  }
+
   document.getElementById('btn-gps-locate').addEventListener('click', function() {
     var statusEl = document.getElementById('gps-status-msg');
     if (!navigator.geolocation) {
-      statusEl.textContent = '이 브라우저는 GPS를 지원하지 않습니다.';
-      statusEl.style.display = 'block';
+      gpsShowExternalBrowserGuide(statusEl);
       return;
     }
-    statusEl.textContent = '📡 위치를 조회하는 중...';
+    statusEl.innerHTML = '📡 위치를 조회하는 중...';
     statusEl.style.display = 'block';
     navigator.geolocation.getCurrentPosition(function(pos) {
       var lat = pos.coords.latitude;
@@ -1410,8 +1416,13 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
       });
       document.getElementById('btn-gps-save').style.display = 'block';
     }, function(err) {
-      var msgs = { 1: 'GPS 권한이 거부됐습니다. 브라우저 설정에서 위치 권한을 허용해주세요.', 2: '위치를 가져올 수 없습니다.', 3: '위치 조회 시간이 초과됐습니다.' };
-      statusEl.textContent = msgs[err.code] || '위치 조회에 실패했습니다.';
+      if (err.code === 1) {
+        gpsShowExternalBrowserGuide(statusEl);
+      } else {
+        var msgs = { 2: '위치 신호를 찾을 수 없습니다. 잠시 후 다시 시도해주세요.', 3: '위치 조회 시간이 초과됐습니다. 다시 시도해주세요.' };
+        statusEl.innerHTML = msgs[err.code] || '위치 조회에 실패했습니다.';
+        statusEl.style.display = 'block';
+      }
     }, { timeout: 10000, enableHighAccuracy: true });
   });
 
