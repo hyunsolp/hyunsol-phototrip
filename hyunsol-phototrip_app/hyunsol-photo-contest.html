@@ -131,11 +131,15 @@
   .gps-result-item:last-child { border-bottom:none; }
   .gps-result-name { font-size:13px; font-weight:700; color:var(--dark-brown); margin-bottom:2px; }
   .gps-result-detail { font-size:11px; color:var(--text-muted); }
-  .gps-saved-item { padding:12px 16px; border-bottom:1px solid rgba(0,0,0,.06); display:flex; align-items:flex-start; gap:10px; }
+  .gps-saved-item { padding:12px 16px; border-bottom:1px solid rgba(0,0,0,.06); display:flex; align-items:center; gap:10px; }
   .gps-saved-item:last-child { border-bottom:none; }
   .gps-saved-info { flex:1; }
   .gps-saved-addr { font-size:13px; color:var(--dark-brown); font-weight:600; margin-bottom:2px; }
   .gps-saved-time { font-size:11px; color:var(--text-muted); }
+  .gps-move-btns { display:flex; flex-direction:column; gap:3px; flex-shrink:0; }
+  .gps-move-btn { width:28px; height:26px; border:1px solid rgba(0,0,0,.12); border-radius:6px; background:#fff; color:var(--dark-brown); font-size:11px; cursor:pointer; padding:0; line-height:1; }
+  .gps-move-btn:disabled { opacity:.25; cursor:default; }
+  .gps-move-btn:not(:disabled):active { background:var(--gold); border-color:var(--gold); }
   .gps-status-msg { font-size:12px; color:var(--text-muted); text-align:center; padding:12px 0; }
 
   /* HOME */
@@ -1478,6 +1482,19 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
     if (e.key === 'Enter') document.getElementById('btn-gps-search-go').click();
   });
 
+  function gpsMoveLoc(fromIdx, toIdx) {
+    var d = getData();
+    if (!currentUser || !d.users || !d.users[currentUser.nickname]) return;
+    var locs = d.users[currentUser.nickname].locations || [];
+    if (toIdx < 0 || toIdx >= locs.length) return;
+    var tmp = locs[fromIdx];
+    locs[fromIdx] = locs[toIdx];
+    locs[toIdx] = tmp;
+    d.users[currentUser.nickname].locations = locs;
+    saveData(d);
+    renderGpsSaved();
+  }
+
   function renderGpsSaved() {
     var savedEl = document.getElementById('gps-saved-list');
     if (!currentUser || !getData().users || !getData().users[currentUser.nickname]) {
@@ -1490,13 +1507,30 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
       return;
     }
     savedEl.innerHTML = '';
-    for (var i = locs.length - 1; i >= 0; i--) {
-      var loc = locs[i];
-      var div = document.createElement('div');
-      div.className = 'gps-saved-item';
-      div.innerHTML = '<span style="font-size:18px;flex-shrink:0;">📌</span>' +
-        '<div class="gps-saved-info"><div class="gps-saved-addr">' + esc(loc.addr) + '</div><div class="gps-saved-time">' + esc(loc.time) + '</div></div>';
-      savedEl.appendChild(div);
+    for (var i = 0; i < locs.length; i++) {
+      (function(idx) {
+        var loc = locs[idx];
+        var div = document.createElement('div');
+        div.className = 'gps-saved-item';
+        div.innerHTML = '<span style="font-size:18px;flex-shrink:0;">📌</span>' +
+          '<div class="gps-saved-info"><div class="gps-saved-addr">' + esc(loc.addr) + '</div><div class="gps-saved-time">' + esc(loc.time) + '</div></div>';
+        var moveWrap = document.createElement('div');
+        moveWrap.className = 'gps-move-btns';
+        var upBtn = document.createElement('button');
+        upBtn.className = 'gps-move-btn';
+        upBtn.textContent = '▲';
+        upBtn.disabled = idx === 0;
+        upBtn.addEventListener('click', function() { gpsMoveLoc(idx, idx - 1); });
+        var downBtn = document.createElement('button');
+        downBtn.className = 'gps-move-btn';
+        downBtn.textContent = '▼';
+        downBtn.disabled = idx === locs.length - 1;
+        downBtn.addEventListener('click', function() { gpsMoveLoc(idx, idx + 1); });
+        moveWrap.appendChild(upBtn);
+        moveWrap.appendChild(downBtn);
+        div.appendChild(moveWrap);
+        savedEl.appendChild(div);
+      })(i);
     }
   }
 
