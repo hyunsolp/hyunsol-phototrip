@@ -127,8 +127,10 @@
   .gps-search-inp { flex:1; padding:10px 12px; border:1.5px solid rgba(0,0,0,.12); border-radius:var(--radius-sm); font-family:inherit; font-size:14px; outline:none; background:#fff; }
   .gps-search-inp:focus { border-color:var(--gold); }
   .btn-gps-do-search { padding:10px 14px; background:var(--dark-brown); color:var(--gold); border:none; border-radius:var(--radius-sm); font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
-  .gps-result-item { padding:12px 16px; border-bottom:1px solid rgba(0,0,0,.06); cursor:pointer; }
+  .gps-result-item { padding:12px 16px; border-bottom:1px solid rgba(0,0,0,.06); display:flex; align-items:center; gap:10px; }
   .gps-result-item:last-child { border-bottom:none; }
+  .gps-result-text { flex:1; cursor:pointer; }
+  .btn-gps-result-save { flex-shrink:0; padding:6px 12px; background:var(--gold); color:var(--dark-brown); border:none; border-radius:6px; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; }
   .gps-result-name { font-size:13px; font-weight:700; color:var(--dark-brown); margin-bottom:2px; }
   .gps-result-detail { font-size:11px; color:var(--text-muted); }
   .gps-saved-item { padding:12px 16px; border-bottom:1px solid rgba(0,0,0,.06); display:flex; align-items:center; gap:10px; }
@@ -1486,8 +1488,11 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
             var div = document.createElement('div');
             div.className = 'gps-result-item';
             var name = item.display_name.split(',')[0];
-            div.innerHTML = '<div class="gps-result-name">' + esc(name) + '</div><div class="gps-result-detail">' + esc(item.display_name) + '</div>';
-            div.addEventListener('click', function() {
+
+            var textWrap = document.createElement('div');
+            textWrap.className = 'gps-result-text';
+            textWrap.innerHTML = '<div class="gps-result-name">' + esc(name) + '</div><div class="gps-result-detail">' + esc(item.display_name) + '</div>';
+            textWrap.addEventListener('click', function() {
               var lat = parseFloat(item.lat);
               var lng = parseFloat(item.lon);
               _gpsCoords = { lat: lat, lng: lng };
@@ -1498,6 +1503,24 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
               document.getElementById('btn-gps-save').style.display = 'block';
               document.getElementById('gps-status-msg').style.display = 'none';
             });
+
+            var saveBtn = document.createElement('button');
+            saveBtn.className = 'btn-gps-result-save';
+            saveBtn.textContent = '저장';
+            saveBtn.addEventListener('click', function() {
+              if (!currentUser) return;
+              var d = getData();
+              if (!d.users || !d.users[currentUser.nickname]) return;
+              if (!d.users[currentUser.nickname].locations) d.users[currentUser.nickname].locations = [];
+              d.users[currentUser.nickname].locations.push({ lat: parseFloat(item.lat), lng: parseFloat(item.lon), addr: item.display_name, time: nowStr() });
+              saveData(d);
+              renderGpsSaved();
+              saveBtn.textContent = '✅';
+              setTimeout(function() { saveBtn.textContent = '저장'; }, 2000);
+            });
+
+            div.appendChild(textWrap);
+            div.appendChild(saveBtn);
             resultsEl.appendChild(div);
           })(data[i]);
         }
