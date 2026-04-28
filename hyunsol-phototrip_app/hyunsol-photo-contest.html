@@ -624,10 +624,18 @@
   }
 
   /* Firebase 실시간 동기화 시작 */
+  var _sessionChecked = false;
   function startFirebaseSync() {
     window._fbOnValue(window._fbRef, function(snapshot) {
       var val = snapshot.val();
       if (val) _appData = val;
+      if (!_sessionChecked) {
+        _sessionChecked = true;
+        if (!currentUser && restoreSession()) {
+          showApp();
+          return;
+        }
+      }
       if (!currentUser) return;
       if (currentUser.isAdmin) {
         try { renderAdmin(); } catch(e) {}
@@ -786,6 +794,7 @@
   /* ── 로그아웃 ── */
   function doLogout() {
     currentUser = null;
+    clearSession();
     selectedGroup = '';
     profilePhotoData = '';
     document.getElementById('inp-nick').value = '';
@@ -830,12 +839,30 @@ if (document.getElementById('inp-admin-id')) document.getElementById('inp-admin-
     try { renderPeople(); } catch(e) {}
   }
 
+  function saveSession() {
+    try { localStorage.setItem('hyunsol_session', JSON.stringify({ nickname: currentUser.nickname, group: currentUser.group || '', reason: currentUser.reason || '' })); } catch(e) {}
+  }
+  function clearSession() {
+    try { localStorage.removeItem('hyunsol_session'); } catch(e) {}
+  }
+  function restoreSession() {
+    try {
+      var s = localStorage.getItem('hyunsol_session');
+      if (!s) return false;
+      var sess = JSON.parse(s);
+      if (!sess || !sess.nickname) return false;
+      currentUser = { nickname: sess.nickname, group: sess.group || '', reason: sess.reason || '' };
+      return true;
+    } catch(e) { return false; }
+  }
+
   function showApp() {
     showScreen('screen-app');
     document.getElementById('disp-nick').textContent = currentUser.nickname + (currentUser.group ? ' · ' + currentUser.group : '');
     document.getElementById('hero-greet').textContent = '안녕하세요, ' + currentUser.nickname + '님';
     setActiveTab('home');
     renderAll();
+    saveSession();
     // Firebase 로딩 완료 후 재렌더
     setTimeout(function() { if (currentUser) renderAll(); }, 1500);
   }
